@@ -1,3 +1,5 @@
+#include <iostream>
+using namespace std;
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -10,8 +12,16 @@ using namespace cv;
 
 int main(int argc, char* argv[])
 {
-	IplImage *img = cvLoadImage("input.png");
-
+//	IplImage *img = cvLoadImage("input.png");
+	IplImage *img=NULL;
+	if(argc > 1)
+		img = cvLoadImage(argv[1]);
+	else
+		img = cvLoadImage("input.png");
+	if(img==NULL){
+		cout << "fail to load image file" << endl;
+		exit(1);
+	}
 	// Mean shift
 	int **ilabels = new int *[img->height];
 	for(int i=0;i<img->height;i++) ilabels[i] = new int [img->width];
