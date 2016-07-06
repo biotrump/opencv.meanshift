@@ -1,3 +1,4 @@
+//http://rsbweb.nih.gov/ij/plugins/download/Mean_Shift.java
 import ij.*;
 import ij.gui.*;
 import ij.plugin.filter.*;
@@ -79,10 +80,10 @@ public class Mean_Shift implements ExtendedPlugInFilter, DialogListener {
 					int num=0;
 
 					for (int ry=-rad; ry <= rad; ry++) {
-						int y2 = yc + ry; 
+						int y2 = yc + ry;
 						if (y2 >= 0 && y2 < height) {
 							for (int rx=-rad; rx <= rad; rx++) {
-								int x2 = xc + rx; 
+								int x2 = xc + rx;
 								if (x2 >= 0 && x2 < width) {
 									if (ry*ry + rx*rx <= rad2) {
 										yiq = pixelsf[y2*width + x2];
@@ -120,7 +121,7 @@ public class Mean_Shift implements ExtendedPlugInFilter, DialogListener {
 					float dI = Ic-IcOld;
 					float dQ = Qc-QcOld;
 
-					shift = dx*dx+dy*dy+dY*dY+dI*dI+dQ*dQ; 
+					shift = dx*dx+dy*dy+dY*dY+dI*dI+dQ*dQ;
 					iters++;
 				}
 				while (shift > 3 && iters < 100);
@@ -147,15 +148,16 @@ public class Mean_Shift implements ExtendedPlugInFilter, DialogListener {
 			if (y%20==0) showProgress( y/(double)height);
 			for (int x=0; x<width; x++) {
 
-				int xc = x;
-				int yc = y;
+				int xc = x;	//start pixel
+				int yc = y;	//
 				int xcOld, ycOld;
 				float YcOld;
 				int pos = y*width + x;
-				float Yc = pixelsf[pos];
+				float Yc = pixelsf[pos];//grey scale at (x,y)
 
 				iters = 0;
 				do {
+					//store current center and grey scale @(xc,yc),value Yc
 					xcOld = xc;
 					ycOld = yc;
 					YcOld = Yc;
@@ -164,44 +166,51 @@ public class Mean_Shift implements ExtendedPlugInFilter, DialogListener {
 					float my = 0;
 					float mY = 0;
 					int num=0;
-
+					//mean shift smoothing
+					//rad : radius(bandwidth) of spatial domain,rad2 : rad^2
+					//(xc,yc) is the point to move, so it's a center with radius, rad.
 					for (int ry=-rad; ry <= rad; ry++) {
-						int y2 = yc + ry; 
-						if (y2 >= 0 && y2 < height) {
+						int y2 = yc + ry;//pts's pos in the radius
+						if (y2 >= 0 && y2 < height) {//y2 is valid pos
 							for (int rx=-rad; rx <= rad; rx++) {
-								int x2 = xc + rx; 
-								if (x2 >= 0 && x2 < width) {
-									if (ry*ry + rx*rx <= rad2) {
+								int x2 = xc + rx;
+								if (x2 >= 0 && x2 < width) {//x2 is in valid pos
+									if (ry*ry + rx*rx <= rad2) {//only pts in circle/sphere is considered!
 
-										float Y2 = pixelsf[y2*width + x2];
+										float Y2 = pixelsf[y2*width + x2];//the grey scale of a point in the sphere
 
-										float dY = Yc - Y2;
+										float dY = Yc - Y2;//delta between center's grey scale to nearby a point
 
-										if (dY*dY <= radCol2) {
+										if (dY*dY <= radCol2) {//radius of range domain (color space)
+											//grey scale difference is also in the bandwidth
+											//sum up the posXY of the points in bandwidth
+											//and sum up the grey scale
 											mx += x2;
 											my += y2;
 											mY += Y2;
-											num++;
+											num++;	//number inside spatial radius and range radius
 										}
 									}
 								}
 							}
 						}
 					}
+					//points inside the spatial radius are calculated with position and grey scale
 					float num_ = 1f/num;
-					Yc = mY*num_;
-					xc = (int) (mx*num_+0.5);
-					yc = (int) (my*num_+0.5);
+					Yc = mY*num_;			//mean of grey scale within the bandwidth b_s,b_r
+					xc = (int) (mx*num_+0.5);	//weigth centerx of the bandwith, circle
+					yc = (int) (my*num_+0.5);	//weigth centery of the bandwith
+					//generate mean shift vector (dx,dy,dY)
 					int dx = xc-xcOld;
 					int dy = yc-ycOld;
 					float dY = Yc-YcOld;
-
-					shift = dx*dx+dy*dy+dY*dY; 
+					//distance of the shift vector
+					shift = dx*dx+dy*dy+dY*dY;
 					iters++;
-				}
+				}//shift threshold is "3", if shift >3, move until shift <=3 (converge)
 				while (shift > 3 && iters < 100);
-
-				pixelsResult[pos] = Yc;
+				//mean shift converge or exceeds iterations, the mode is found!
+				pixelsResult[pos] = Yc;//replace the scale with the mode point's value, smoothing
 			}
 		}
 	}
@@ -222,7 +231,7 @@ public class Mean_Shift implements ExtendedPlugInFilter, DialogListener {
 		rad2 = rad*rad;
 		radCol = (float) (gd.getNextNumber() + 1);
 		radCol2 = radCol*radCol;
-		
+
 		return true;
 	}
 
