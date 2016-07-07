@@ -18,7 +18,7 @@
 using namespace cv;
 
 // Distance used in Mean Shift
-inline int color_distance( const IplImage* img, int x1, int y1, int x2, int y2 ) 
+inline int color_distance( const IplImage* img, int x1, int y1, int x2, int y2 )
 {
 	int r = ((uchar *)(img->imageData + x1*img->widthStep))[y1*img->nChannels + 0]
 	- ((uchar *)(img->imageData + x2*img->widthStep))[y2*img->nChannels + 0];
@@ -28,22 +28,45 @@ inline int color_distance( const IplImage* img, int x1, int y1, int x2, int y2 )
 	- ((uchar *)(img->imageData + x2*img->widthStep))[y2*img->nChannels + 2];
 	return r*r+g*g+b*b;
 }
+
 inline float color_distance( const float* a, const float* b)
 {
 	float l = a[0]-b[0], u=a[1]-b[1], v=a[2]-b[2];
 	return l*l+u*u+v*v;
 }
+
 inline float color_distance( const Vec3f& a, const Vec3f& b)
 {
 	float l = a.val[0]-b.val[0], u=a.val[1]-b.val[1], v=a.val[2]-b.val[2];
 	return l*l+u*u+v*v;
 }
-inline int spatial_distance( const CvPoint& q, const CvPoint& p ) 
+
+inline int range_distance( const int16_t* ndi_buf, int width, int nChannels,
+						   int x1, int y1, int x2, int y2 )
+{
+	int16_t n0=ndi_buf [ (y1*width+x1)*nChannels + 0]-
+		ndi_buf [ (y2*width+x2)*nChannels + 0];
+	int16_t n1=ndi_buf [ (y1*width+x1)*nChannels + 1]-
+		ndi_buf [ (y2*width+x2)*nChannels + 1];
+	int16_t n2=ndi_buf [ (y1*width+x1)*nChannels + 2]-
+		ndi_buf [ (y2*width+x2)*nChannels + 2];
+
+	return n0*n0+n1*n1+n2*n2;
+}
+
+inline int range_distance( const int16_t* a, const int16_t* b)
+{
+	int n0 = a[0]-b[0], n1=a[1]-b[1], n2=a[2]-b[2];
+	return n0*n0+n1*n1+n2*n2;
+}
+
+inline int spatial_distance( const CvPoint& q, const CvPoint& p )
 {
 	int a = q.x-p.x, b=q.y-p.y;
 	return a*a+b*b;
 }
-inline int getLabel( std::vector<int>& unionfind, int l ) 
+
+inline int getLabel( std::vector<int>& unionfind, int l )
 {
 	int r = unionfind[l];
 	if(unionfind[r] == r)
@@ -54,7 +77,8 @@ inline int getLabel( std::vector<int>& unionfind, int l )
 		return unionfind[l];
 	}
 }
-inline int getLabel2( std::vector<int>& unionfind, int l ) 
+
+inline int getLabel2( std::vector<int>& unionfind, int l )
 {
 	int r = unionfind[l];
 	if(r<0)
@@ -66,10 +90,32 @@ inline int getLabel2( std::vector<int>& unionfind, int l )
 	}
 }
 
-const int spatial_radius = 10;
-const double color_radius = 6.5;
-int MeanShift(const IplImage* img, int **labels);
+const int SPATIAL_RADIUS = 10;
+const double COLOR_RADIUS = 6.5;
+const int16_t RANGE_RADIUS = 650;//maybe discrete int16_t in feature space
+const uint32_t SHIFT_THRESHOLD_MAX=(1u)<<31;
+const int MAX_ITERS=100;
 
+extern int spatial_radius;
+extern float color_radius;
+extern int range_radius;
+
+
+int MeanShiftRGB(const IplImage* img, int **labels);
+
+/** @brief A spatial-range joint domain feature space. The range domain is a generic feature space
+ * with 3 channels. The range domain is NDI normalized between -32767 to 32767.
+ * spatial (x,y) is the image dimension.
+ * so there are still 5d , joint spatial-range domain feature space.
+ * @param[IN,OUT] labels[][] : preallocated table to store the label of every pixel
+ * after meanshift
+ * @param[IN] img : cvCreateImageHeader(IPL_DEPTH_16S, 3), 3 channel feature space with
+ * 16bit per channel. Each channel coresponds to its NDI.
+ * @return : regionCount, cluster numbers
+ */
+int MeanShiftGeneric3DS16(int16_t *ndi_buf, const int width, const int height,
+						  const int nChannels, const uint32_t shift_thrshold,
+						  const int16_t max_iters, int **labels);
 // RAList from EDISON
 
 class RAList {
