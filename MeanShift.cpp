@@ -958,6 +958,5 @@ int MeanShiftGeneric3DS16(int16_t *ndi_buf, const int width, const int height,
 
 		cvReleaseImage(&tobeshow16SC3);
 		tobeshow16SC3=NULL;
-
 		return regionCount;
 }
