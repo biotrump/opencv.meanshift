@@ -165,7 +165,9 @@ int MeanShiftRGB(const IplImage* img, int **labels)
 				for(int j=0;j<img->width;j++)
 					if(labels[i][j]<0)
 					{
+						int cnts=0;
 						labels[i][j] = ++label;
+						modePointCounts[label]=1;
 						float L = (float)((uchar *)(result->imageData + i*img->widthStep))[j*result->nChannels + 0],
 							U = (float)((uchar *)(result->imageData + i*img->widthStep))[j*result->nChannels + 1],
 							V = (float)((uchar *)(result->imageData + i*img->widthStep))[j*result->nChannels + 2];
@@ -195,12 +197,19 @@ int MeanShiftRGB(const IplImage* img, int **labels)
 									mode[label*3+0] += L*100/255;
 									mode[label*3+1] += 354*U/255-134;
 									mode[label*3+2] += 256*V/255-140;
+									cnts++;
 								}
 							}
 						}
-						mode[label*3+0] /= modePointCounts[label];
-						mode[label*3+1] /= modePointCounts[label];
-						mode[label*3+2] /= modePointCounts[label];
+						if(cnts){
+							mode[label*3+0] /= modePointCounts[label];
+							mode[label*3+1] /= modePointCounts[label];
+							mode[label*3+2] /= modePointCounts[label];
+						}else{
+							std::cout << "orphan mode:" << label << ",@(" << i <<"," << j <<")" <<std::endl;
+							std::cout << "modePointCounts:" << modePointCounts[label] <<std::endl;
+							
+						}
 					}
 					//current Region count
 					regionCount = label+1;
