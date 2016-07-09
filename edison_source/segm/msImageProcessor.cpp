@@ -347,6 +347,11 @@ void msImageProcessor::RemoveWeightMap( void )
 /*      - the filtered image is stored in the private  */
 /*        data members of the msImageProcessor class.  */
 /*******************************************************/
+////////////////////////////////////////////////////////
+//1. find the mode pixel, end point, for every pixel by mean shift.
+//2. replace every pixel value by its mode value
+//3. an output image, msRawData[] && LUV_data, with its mode value, 
+//so the image is smoothed.
 
 void msImageProcessor::Filter(int sigmaS, float sigmaR, SpeedUpLevel speedUpLevel)
 {
@@ -3326,6 +3331,10 @@ void msImageProcessor::DestroyOutput( void )
 
 }
 
+////////////////////////////////////////////////////////
+//1. find the mode pixel, end point, for every pixel by mean shift.
+//2. replace every pixel value by its mode value
+//3. an output image, msRawData[], with its mode value, so the image is smoothed.
 // NEW
 void msImageProcessor::NewOptimizedFilter1(float sigmaS, float sigmaR)
 {
@@ -4272,11 +4281,15 @@ void msImageProcessor::NewOptimizedFilter2(float sigmaS, float sigmaR)
 			modeTable[modeCandidate_i] = 1;
 
 			//store result into msRawData...
+			//mean shift smooth by replace current pixel feature with
+			//mode feature
 			for(k = 0; k < N; k++)
 				msRawData[N*modeCandidate_i+k] = (float)(yk[k+2]);
 		}
 
 		//store result into msRawData...
+		//mean shift smooth by replace current pixel feature with
+		//mode feature
 		for(j = 0; j < N; j++)
 			msRawData[N*i+j] = (float)(yk[j+2]);
 
@@ -4630,6 +4643,8 @@ void msImageProcessor::NewNonOptimizedFilter(float sigmaS, float sigmaR)
 			yk[j] += Mh[j];
 		
 		//store result into msRawData...
+		//meanshift smooth result by replace current position's pixel feature 
+		//by the mode feature value
 		for(j = 0; j < N; j++)
 			msRawData[N*i+j] = (float)(yk[j+2]*sigmaR);
 
