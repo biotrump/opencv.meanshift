@@ -4,7 +4,9 @@ Edge Detection and Image SegmentatiON (EDISON) System ver1.0 README
 System Overview:
 ===============
 
-The EDISON system is a low-level vision tool that performs confidence based edge detection and synergistic image segmentation. It is packaged under a platform independent graphical user interface. A command prompt version is also provided.
+The EDISON system is a low-level vision tool that performs confidence based edge detection and
+synergistic image segmentation. It is packaged under a platform independent graphical user interface.
+A command prompt version is also provided.
 
 Table of Contents:
 -------------------
@@ -62,7 +64,9 @@ Although our system is thoroughly tested bugs may still exist. We would greatly 
 
 -------------------------------------------------------------------------------------------------
 
-In order to compile the graphical user interface version of EDISON wxWindows must be download and installed. It may be obtained from the wxWindows web site at http://www.wxWindows.org.
+In order to compile the graphical user interface version of EDISON wxWindows
+must be download and installed. It may be obtained from the wxWindows web site at
+http://www.wxWindows.org.
 
 ================================================================================================
 
@@ -98,7 +102,7 @@ Laboratory Contact Information
 ------------------------------
 
 Laboratory Website:
-	
+
 	www.caip.rutgers.edu/riul/
 
 ================================================================================================

@@ -1,0 +1,51 @@
+> mkdir buildgtk
+> cd buildgtk
+> ../configure --with-gtk
+> make
+> su <type root password>
+> make install
+> ldconfig
+[if you get "ldconfig: command not found", try using "/sbin/ldconfig"]
+
+If you don't do the 'make install' part, you can still use the libraries from
+the buildgtk directory, but they may not be available to other users.
+
+If you want to remove wxWidgets on Unix you can do this:
+
+> su <type root password>
+> make uninstall
+> ldconfig
+
+Note that by default, GTK+ 2.x is used. GTK+ 3 can be specified
+with --with-gtk=3.
+
+* The expert case
+-----------------
+
+If you want to do some more serious cross-platform programming with wxWidgets,
+such as for GTK+ and Motif, you can now build two complete libraries and use
+them concurrently. To do this, create a separate directory for each build
+of wxWidgets - you may also want to create different versions of wxWidgets
+and test them concurrently. Most typically, this would be a version configured
+with --enable-debug and one without.
+
+For building three versions (one GTK+, one Motif and a debug version of the GTK
+source) you'd do this:
+
+mkdir buildmotif
+cd buildmotif
+../configure --with-motif
+make
+cd ..
+
+mkdir buildgtk
+cd buildgtk
+../configure --with-gtk
+make
+cd ..
+
+mkdir buildgtkd
+cd buildgtkd
+../configure --with-gtk --enable-debug
+make
+cd ..

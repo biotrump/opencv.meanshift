@@ -82,7 +82,7 @@ int MeanShiftRGB(const IplImage* img, int **labels)
 			L = L*100/255;
 			U = U-128;
 			V = V-128;
-			double shift = 5;
+			//double shift = 5;
 			for (int iters=0;shift > 3 && iters < 100;iters++)
 			{
 				icOld = ic;
