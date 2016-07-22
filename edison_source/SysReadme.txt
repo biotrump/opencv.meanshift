@@ -68,6 +68,11 @@ In order to compile the graphical user interface version of EDISON wxWindows
 must be download and installed. It may be obtained from the wxWindows web site at
 http://www.wxWindows.org.
 
+ubuntu 14.04 trusty
+http://codelite.org/LiteEditor/WxWidgets30Binaries#toc2
+
+#build wxWindows app
+http://www.binarytides.com/install-wxwidgets-ubuntu/
 ================================================================================================
 
 (E) References

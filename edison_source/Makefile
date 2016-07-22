@@ -13,17 +13,23 @@ COMMAND_SOURCE	= prompt/main.cpp prompt/parser.cpp prompt/globalFnc.cpp prompt/e
 COMMAND_INCLUDES	= prompt/parser.h prompt/defs.h prompt/error.h prompt/flags.h prompt/edison.h
 IMAGE_SOURCE	= prompt/libppm.cpp
 IMAGE_INCLUDES	= prompt/imfilt.h prompt/libppm.h
+GUI_SOURCE	= GUI/BgImagPGM.cpp GUI/BgImagPNM.cpp GUI/bgimsystem.cpp
+GUI_INCLUDES	= GUI/BgImagPGM.h GUI/BgImagPNM.h GUI/bgimsystem.h
 SEGM_SOURCE     = segm/ms.cpp segm/msSysPrompt.cpp segm/msImageProcessor.cpp segm/RAList.cpp segm/rlist.cpp
 SEGM_INCLUDES   = segm/tdef.h segm/RAList.h segm/ms.h segm/msImageProcessor.h segm/msSys.h segm/rlist.h
 EDGE_SOURCE     = edge/BgEdge.cpp edge/BgEdgeDetect.cpp edge/BgEdgeList.cpp edge/BgGlobalFc.cpp edge/BgImage.cpp
 EDGE_INCLUDES	= edge/BgDefaults.h edge/BgEdge.h edge/BgEdgeDetect.h edge/BgImage.h
 
 #define targets
-all: EDISON
+all: EDISON WXGUI
 
 EDISON	: $(COMMAND_SOURCE) $(COMMAND_INCLUDES) $(IMAGE_SOURCE) $(IMAGE_INCLUDES) $(SEGM_SOURCE) $(SEGM_INCLUDES) $(EDGE_SOURCE) $(EDGE_INCLUDES)
 	$(CC) -o $(EXENAME) $(COMMAND_SOURCE) $(IMAGE_SOURCE) $(SEGM_SOURCE) $(EDGE_SOURCE)
 
+WXGUI	: $(GUI_SOURCE) $(GUI_INCLUDES) $(IMAGE_SOURCE) $(IMAGE_INCLUDES) $(SEGM_SOURCE) $(SEGM_INCLUDES) $(EDGE_SOURCE) $(EDGE_INCLUDES)
+	$(CC) -I edge -I segm -o $(EXENAME) $(GUI_SOURCE) $(IMAGE_SOURCE) $(SEGM_SOURCE) $(EDGE_SOURCE)
+
+#	$(CC) `wx-config --cxxflags --libs std,aui` -I edge -I segm -o $(EXENAME) $(GUI_SOURCE) $(IMAGE_SOURCE) $(SEGM_SOURCE) $(EDGE_SOURCE)
 
 
 
